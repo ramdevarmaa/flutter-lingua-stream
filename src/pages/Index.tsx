@@ -1,13 +1,33 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { PlatformSelector } from '@/components/PlatformSelector';
+import { HostMode } from '@/components/HostMode';
+import { ClientMode } from '@/components/ClientMode';
+
+type AppMode = 'selector' | 'host' | 'client';
 
 const Index = () => {
+  const [currentMode, setCurrentMode] = useState<AppMode>('selector');
+
+  const handleModeSelect = (mode: 'host' | 'client') => {
+    setCurrentMode(mode);
+  };
+
+  const handleBack = () => {
+    setCurrentMode('selector');
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {currentMode === 'selector' && (
+        <PlatformSelector onModeSelect={handleModeSelect} />
+      )}
+      {currentMode === 'host' && (
+        <HostMode onBack={handleBack} />
+      )}
+      {currentMode === 'client' && (
+        <ClientMode onBack={handleBack} />
+      )}
+    </>
   );
 };
 
