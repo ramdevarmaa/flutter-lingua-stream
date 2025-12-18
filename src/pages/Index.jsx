@@ -3,12 +3,10 @@ import { PlatformSelector } from '@/components/PlatformSelector';
 import { HostMode } from '@/components/HostMode';
 import { ClientMode } from '@/components/ClientMode';
 
-type AppMode = 'selector' | 'host' | 'client';
-
 const Index = () => {
-  const [currentMode, setCurrentMode] = useState<AppMode>('selector');
+  const [currentMode, setCurrentMode] = useState('selector');
 
-  const handleModeSelect = (mode: 'host' | 'client') => {
+  const handleModeSelect = (mode) => {
     setCurrentMode(mode);
   };
 

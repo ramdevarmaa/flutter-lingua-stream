@@ -3,15 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Mic, Users, Smartphone, Monitor, Tablet, Wifi } from 'lucide-react';
-import { detectPlatform, canActAsHost, type PlatformInfo } from '@/utils/platform';
+import { detectPlatform, canActAsHost } from '@/utils/platform';
 
-interface PlatformSelectorProps {
-  onModeSelect: (mode: 'host' | 'client') => void;
-}
-
-export function PlatformSelector({ onModeSelect }: PlatformSelectorProps) {
-  const [platform, setPlatform] = useState<PlatformInfo | null>(null);
-  const [selectedMode, setSelectedMode] = useState<'host' | 'client' | null>(null);
+export function PlatformSelector({ onModeSelect }) {
+  const [platform, setPlatform] = useState(null);
+  const [selectedMode, setSelectedMode] = useState(null);
 
   useEffect(() => {
     const detectedPlatform = detectPlatform();
@@ -23,7 +19,7 @@ export function PlatformSelector({ onModeSelect }: PlatformSelectorProps) {
     }
   }, []);
 
-  const handleModeSelect = (mode: 'host' | 'client') => {
+  const handleModeSelect = (mode) => {
     setSelectedMode(mode);
     onModeSelect(mode);
   };

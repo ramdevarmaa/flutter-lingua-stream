@@ -1,21 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-interface AudioVisualizerProps {
-  audioLevel: number;
-  isActive: boolean;
-  className?: string;
-  barCount?: number;
-}
-
 export function AudioVisualizer({ 
   audioLevel, 
   isActive, 
   className,
   barCount = 32 
-}: AudioVisualizerProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+}) {
+  const canvasRef = useRef(null);
+  const animationRef = useRef();
 
   useEffect(() => {
     const canvas = canvasRef.current;
