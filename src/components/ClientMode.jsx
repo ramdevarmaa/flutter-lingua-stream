@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { 
   Wifi, 
@@ -13,29 +12,14 @@ import {
   Play, 
   Pause,
   ArrowLeft,
-  Languages,
   Activity,
   Settings,
   Smartphone
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'it', name: 'Italian', flag: '🇮🇹' },
-  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
-  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
-];
-
 export function ClientMode({ onBack }) {
   const [serverAddress, setServerAddress] = useState('192.168.1.100:8080');
-  const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [volume, setVolume] = useState([80]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -46,13 +30,12 @@ export function ClientMode({ onBack }) {
     serverInfo: null
   });
   const [liveTranscript, setLiveTranscript] = useState('');
-  const [translation, setTranslation] = useState('');
   
   const audioRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate receiving live transcript and translation
+    // Simulate receiving live transcript
     const interval = setInterval(() => {
       if (connectionStatus.connected && isPlaying) {
         const mockTranscripts = [
@@ -62,16 +45,8 @@ export function ClientMode({ onBack }) {
           "Let's begin with a brief overview of the current situation."
         ];
         
-        const mockTranslations = [
-          "Hola a todos, bienvenidos a nuestra conferencia internacional.",
-          "Hoy discutiremos el futuro de la tecnología.",
-          "Estoy emocionado de compartir nuestros últimos hallazgos de investigación con ustedes.",
-          "Comencemos con una breve descripción de la situación actual."
-        ];
-        
         const randomIndex = Math.floor(Math.random() * mockTranscripts.length);
         setLiveTranscript(mockTranscripts[randomIndex]);
-        setTranslation(mockTranslations[randomIndex]);
       }
     }, 3000);
 
@@ -92,14 +67,13 @@ export function ClientMode({ onBack }) {
         error: null,
         serverInfo: {
           host: serverAddress.split(':')[0],
-          port: serverAddress.split(':')[1] || '8080',
-          availableLanguages: ['en', 'es', 'fr', 'de', 'it']
+          port: serverAddress.split(':')[1] || '8080'
         }
       });
       
       toast({
         title: "Connected Successfully",
-        description: `Connected to translation server at ${serverAddress}`,
+        description: `Connected to server at ${serverAddress}`,
       });
       
     } catch (error) {
@@ -111,7 +85,7 @@ export function ClientMode({ onBack }) {
       
       toast({
         title: "Connection Failed",
-        description: "Could not connect to the translation server",
+        description: "Could not connect to the server",
         variant: "destructive",
       });
     }
@@ -126,11 +100,10 @@ export function ClientMode({ onBack }) {
     });
     setIsPlaying(false);
     setLiveTranscript('');
-    setTranslation('');
     
     toast({
       title: "Disconnected",
-      description: "Disconnected from translation server",
+      description: "Disconnected from server",
     });
   };
 
@@ -142,26 +115,18 @@ export function ClientMode({ onBack }) {
     if (!isPlaying) {
       toast({
         title: "Audio Started",
-        description: `Now playing ${SUPPORTED_LANGUAGES.find(l => l.code === selectedLanguage)?.name} translation`,
+        description: "Now playing live audio",
       });
     } else {
       toast({
         title: "Audio Paused",
-        description: "Translation audio paused",
+        description: "Audio paused",
       });
     }
   };
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
-  };
-
-  const getLanguageName = (code) => {
-    return SUPPORTED_LANGUAGES.find(l => l.code === code)?.name || code;
-  };
-
-  const getLanguageFlag = (code) => {
-    return SUPPORTED_LANGUAGES.find(l => l.code === code)?.flag || '🌐';
   };
 
   return (
@@ -182,7 +147,7 @@ export function ClientMode({ onBack }) {
                 <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                   Client Mode
                 </h1>
-                <p className="text-muted-foreground">Receiving live audio translation</p>
+                <p className="text-muted-foreground">Receiving live audio</p>
               </div>
             </div>
           </div>
@@ -288,38 +253,6 @@ export function ClientMode({ onBack }) {
               </h3>
 
               <div className="space-y-6">
-                {/* Language Selection */}
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-3 block">
-                    Translation Language
-                  </label>
-                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {connectionStatus.serverInfo?.availableLanguages.map(langCode => {
-                        const lang = SUPPORTED_LANGUAGES.find(l => l.code === langCode);
-                        return lang ? (
-                          <SelectItem key={langCode} value={langCode}>
-                            <span className="flex items-center gap-2">
-                              <span>{lang.flag}</span>
-                              {lang.name}
-                            </span>
-                          </SelectItem>
-                        ) : null;
-                      }) || SUPPORTED_LANGUAGES.slice(0, 5).map(lang => (
-                        <SelectItem key={lang.code} value={lang.code}>
-                          <span className="flex items-center gap-2">
-                            <span>{lang.flag}</span>
-                            {lang.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 {/* Playback Controls */}
                 <div className="flex items-center justify-center gap-4">
                   <Button
@@ -381,7 +314,7 @@ export function ClientMode({ onBack }) {
                     {isPlaying ? (
                       <>
                         <Activity className="w-3 h-3 mr-2" />
-                        Playing {getLanguageName(selectedLanguage)}
+                        Playing Audio
                       </>
                     ) : (
                       <>
@@ -397,45 +330,19 @@ export function ClientMode({ onBack }) {
             {/* Live Transcript */}
             <Card className="p-6 bg-gradient-card border-border/50 shadow-card">
               <h3 className="text-xl font-semibold flex items-center gap-2 mb-4">
-                <Languages className="w-5 h-5" />
-                Live Transcript & Translation
+                <Activity className="w-5 h-5" />
+                Live Transcript
               </h3>
               
-              <div className="space-y-4">
-                {/* Original Text */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      🇺🇸 Original (English)
-                    </Badge>
-                  </div>
-                  <div className="bg-muted/20 rounded-lg p-4 min-h-16 font-mono text-sm">
-                    {liveTranscript || (
-                      <span className="text-muted-foreground italic">
-                        {connectionStatus.connected ? 
-                          (isPlaying ? 'Listening for speech...' : 'Start playback to see transcript') : 
-                          'Connect to server to receive live transcript'
-                        }
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Translation */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs">
-                      {getLanguageFlag(selectedLanguage)} Translation ({getLanguageName(selectedLanguage)})
-                    </Badge>
-                  </div>
-                  <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 min-h-16 font-mono text-sm">
-                    {translation || (
-                      <span className="text-muted-foreground italic">
-                        Translation will appear here...
-                      </span>
-                    )}
-                  </div>
-                </div>
+              <div className="bg-muted/20 rounded-lg p-4 min-h-24 font-mono text-sm">
+                {liveTranscript || (
+                  <span className="text-muted-foreground italic">
+                    {connectionStatus.connected ? 
+                      (isPlaying ? 'Listening for speech...' : 'Start playback to see transcript') : 
+                      'Connect to server to receive live transcript'
+                    }
+                  </span>
+                )}
               </div>
             </Card>
           </div>
@@ -462,22 +369,20 @@ export function ClientMode({ onBack }) {
                 {connectionStatus.serverInfo && (
                   <>
                     <div className="flex justify-between">
-                      <span>Server:</span>
-                      <span className="font-mono text-xs">{connectionStatus.serverInfo.host}</span>
+                      <span>Host:</span>
+                      <span className="font-mono">{connectionStatus.serverInfo.host}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Port:</span>
                       <span className="font-mono">{connectionStatus.serverInfo.port}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Languages:</span>
-                      <span>{connectionStatus.serverInfo.availableLanguages.length}</span>
-                    </div>
                   </>
                 )}
                 <div className="flex justify-between">
-                  <span>WebRTC:</span>
-                  <span className="text-success">Supported</span>
+                  <span>Audio:</span>
+                  <span className={isPlaying ? "text-success" : "text-muted-foreground"}>
+                    {isPlaying ? 'Playing' : 'Stopped'}
+                  </span>
                 </div>
               </div>
             </Card>
@@ -495,48 +400,25 @@ export function ClientMode({ onBack }) {
                   <span>{isMuted ? 'Muted' : `${volume[0]}%`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Language:</span>
-                  <span>{getLanguageName(selectedLanguage)}</span>
+                  <span>Latency:</span>
+                  <span className="text-success">Low</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Quality:</span>
-                  <span className="text-success">High (44.1kHz)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Latency:</span>
-                  <span className="text-success">~200ms</span>
+                  <span>High</span>
                 </div>
               </div>
             </Card>
 
-            {/* Available Languages */}
+            {/* Help */}
             <Card className="p-6 bg-gradient-card border-border/50 shadow-card">
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <Languages className="w-5 h-5" />
-                Available Languages
-              </h3>
-              
-              <div className="space-y-2">
-                {(connectionStatus.serverInfo?.availableLanguages || ['en', 'es', 'fr', 'de', 'it']).map(langCode => {
-                  const lang = SUPPORTED_LANGUAGES.find(l => l.code === langCode);
-                  if (!lang) return null;
-                  
-                  return (
-                    <div
-                      key={langCode}
-                      className={`flex items-center gap-2 p-2 rounded-lg text-sm ${
-                        selectedLanguage === langCode ? 'bg-accent/20 border border-accent/30' : 'bg-muted/10'
-                      }`}
-                    >
-                      <span>{lang.flag}</span>
-                      <span className={selectedLanguage === langCode ? 'font-medium' : ''}>{lang.name}</span>
-                      {selectedLanguage === langCode && (
-                        <Badge variant="secondary" className="ml-auto text-xs">Active</Badge>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <h3 className="text-lg font-semibold mb-4">How to Connect</h3>
+              <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
+                <li>Get the server address from the host</li>
+                <li>Enter the address above</li>
+                <li>Click "Connect to Server"</li>
+                <li>Press play to start audio</li>
+              </ol>
             </Card>
           </div>
         </div>
