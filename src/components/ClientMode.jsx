@@ -20,21 +20,6 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface ClientModeProps {
-  onBack: () => void;
-}
-
-interface ConnectionStatus {
-  connected: boolean;
-  connecting: boolean;
-  error: string | null;
-  serverInfo: {
-    host: string;
-    port: string;
-    availableLanguages: string[];
-  } | null;
-}
-
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
@@ -48,13 +33,13 @@ const SUPPORTED_LANGUAGES = [
   { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
 ];
 
-export function ClientMode({ onBack }: ClientModeProps) {
+export function ClientMode({ onBack }) {
   const [serverAddress, setServerAddress] = useState('192.168.1.100:8080');
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [volume, setVolume] = useState([80]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
+  const [connectionStatus, setConnectionStatus] = useState({
     connected: false,
     connecting: false,
     error: null,
@@ -63,7 +48,7 @@ export function ClientMode({ onBack }: ClientModeProps) {
   const [liveTranscript, setLiveTranscript] = useState('');
   const [translation, setTranslation] = useState('');
   
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -171,11 +156,11 @@ export function ClientMode({ onBack }: ClientModeProps) {
     setIsMuted(!isMuted);
   };
 
-  const getLanguageName = (code: string) => {
+  const getLanguageName = (code) => {
     return SUPPORTED_LANGUAGES.find(l => l.code === code)?.name || code;
   };
 
-  const getLanguageFlag = (code: string) => {
+  const getLanguageFlag = (code) => {
     return SUPPORTED_LANGUAGES.find(l => l.code === code)?.flag || '🌐';
   };
 

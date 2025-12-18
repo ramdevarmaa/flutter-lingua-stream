@@ -18,18 +18,6 @@ import {
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { useToast } from '@/hooks/use-toast';
 
-interface HostModeProps {
-  onBack: () => void;
-}
-
-interface ConnectedClient {
-  id: string;
-  name: string;
-  language: string;
-  connected: boolean;
-  lastSeen: number;
-}
-
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
@@ -43,23 +31,23 @@ const SUPPORTED_LANGUAGES = [
   { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
 ];
 
-export function HostMode({ onBack }: HostModeProps) {
+export function HostMode({ onBack }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isServerRunning, setIsServerRunning] = useState(false);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en', 'es']);
-  const [connectedClients, setConnectedClients] = useState<ConnectedClient[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState(['en', 'es']);
+  const [connectedClients, setConnectedClients] = useState([]);
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
   const [serverPort, setServerPort] = useState('8080');
   
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const analyzerRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const analyzerRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
     // Simulate some connected clients for demo
-    const mockClients: ConnectedClient[] = [
+    const mockClients = [
       { id: '1', name: 'Mobile Client 1', language: 'es', connected: true, lastSeen: Date.now() },
       { id: '2', name: 'Desktop Client', language: 'fr', connected: true, lastSeen: Date.now() },
     ];
@@ -139,7 +127,7 @@ export function HostMode({ onBack }: HostModeProps) {
     updateLevel();
   };
 
-  const addLanguage = (langCode: string) => {
+  const addLanguage = (langCode) => {
     if (!selectedLanguages.includes(langCode)) {
       setSelectedLanguages([...selectedLanguages, langCode]);
       toast({
@@ -149,7 +137,7 @@ export function HostMode({ onBack }: HostModeProps) {
     }
   };
 
-  const removeLanguage = (langCode: string) => {
+  const removeLanguage = (langCode) => {
     if (selectedLanguages.length > 1) {
       setSelectedLanguages(selectedLanguages.filter(l => l !== langCode));
     }

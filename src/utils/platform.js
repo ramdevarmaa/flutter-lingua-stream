@@ -2,22 +2,10 @@
  * Platform detection utilities for the real-time audio translation system
  */
 
-export type PlatformType = 'desktop' | 'mobile' | 'tablet';
-export type DeviceCapabilities = 'host-client' | 'client-only';
-
-export interface PlatformInfo {
-  type: PlatformType;
-  capabilities: DeviceCapabilities;
-  os: string;
-  isTouchDevice: boolean;
-  supportsWebRTC: boolean;
-  supportsMediaDevices: boolean;
-}
-
 /**
  * Detects the current platform and determines device capabilities
  */
-export function detectPlatform(): PlatformInfo {
+export function detectPlatform() {
   const userAgent = navigator.userAgent.toLowerCase();
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   
@@ -30,7 +18,7 @@ export function detectPlatform(): PlatformInfo {
   else if (userAgent.includes('ios') || userAgent.includes('iphone') || userAgent.includes('ipad')) os = 'ios';
 
   // Platform type detection
-  let type: PlatformType = 'desktop';
+  let type = 'desktop';
   if (userAgent.includes('mobile') || userAgent.includes('android') || userAgent.includes('iphone')) {
     type = 'mobile';
   } else if (userAgent.includes('tablet') || userAgent.includes('ipad')) {
@@ -38,10 +26,10 @@ export function detectPlatform(): PlatformInfo {
   }
 
   // Determine capabilities based on platform
-  const capabilities: DeviceCapabilities = type === 'desktop' ? 'host-client' : 'client-only';
+  const capabilities = type === 'desktop' ? 'host-client' : 'client-only';
 
   // Feature detection
-  const supportsWebRTC = !!(window.RTCPeerConnection || (window as any).mozRTCPeerConnection || (window as any).webkitRTCPeerConnection);
+  const supportsWebRTC = !!(window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection);
   const supportsMediaDevices = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
   return {
@@ -57,7 +45,7 @@ export function detectPlatform(): PlatformInfo {
 /**
  * Check if the current device can act as a host
  */
-export function canActAsHost(platform: PlatformInfo): boolean {
+export function canActAsHost(platform) {
   return platform.capabilities === 'host-client' && 
          platform.supportsWebRTC && 
          platform.supportsMediaDevices;
@@ -66,7 +54,7 @@ export function canActAsHost(platform: PlatformInfo): boolean {
 /**
  * Get recommended audio settings based on platform
  */
-export function getAudioSettings(platform: PlatformInfo) {
+export function getAudioSettings(platform) {
   if (platform.type === 'mobile') {
     return {
       sampleRate: 16000,
